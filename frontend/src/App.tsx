@@ -56,7 +56,13 @@ function App() {
           Add Contact
         </button>
       </div>
-      <Contacts contacts={data.contacts} />
+      {data.contacts.length == 0 ? (
+        <div className="text-center text-md ">
+          You don&apos;t have any contacts .
+        </div>
+      ) : (
+        <Contacts contacts={data.contacts} />
+      )}
       <div className="fixed bottom-10 right-5">
         <div className="flex gap-2">
           {Array.from({ length: data.pagination.totalPages }).map(
