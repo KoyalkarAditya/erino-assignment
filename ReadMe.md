@@ -41,3 +41,20 @@ npm run dev
    npm run dev
 
 Now, both your backend and frontend should be running, and you can interact with the application.
+
+# Project Description
+
+This project is a contact management application that allows users to create, update, delete, and paginate through their contact list efficiently. Built with a robust backend using Prisma and PostgreSQL for managing data, and a Vite powered frontend .
+
+## Key Features
+
+- Create, Update, and Delete Contacts: Users can seamlessly add new contacts, modify existing ones, and delete any contact as needed.
+- Pagination: The contact list is paginated to improve user experience, allowing users to view contacts in pages rather than all at once.
+- Data Fetching with React Query: Using React Query for data fetching, caching, and synchronization ensures that the frontend stays updated with minimal lag and enables real-time responsiveness.
+- Type Safety with TypeScript: TypeScript is used throughout the codebase to ensure type safety, reduce runtime errors, and facilitate code reusability by providing strong typing and interfaces.
+
+## Tech Stack
+
+- Frontend: Vite, React, React Query, TypeScript
+- Backend: Node.js, Prisma, PostgreSQL
+- Database: PostgreSQL with Prisma ORM
