@@ -108,10 +108,6 @@ const CreateContactDialog = ({ onClose, open, contact, onSave }: Props) => {
                   type="text"
                   {...register("phoneNumber", {
                     required: "Phone number is required",
-                    pattern: {
-                      value: /^[0-9]{10}$/,
-                      message: "Phone number must be 10 digits",
-                    },
                   })}
                 />
               </label>
