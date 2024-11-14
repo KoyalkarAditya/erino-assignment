@@ -5,8 +5,24 @@ const router = express.Router();
 
 router.get("/", async (req: Request, res: Response) => {
   try {
-    const contacts = await prisma.contact.findMany();
-    res.status(200).json(contacts);
+    const pageSize = 5;
+    const page = parseInt(req.query.page as string) || 1;
+    const skip = (page - 1) * pageSize;
+    const contacts = await prisma.contact.findMany({
+      skip: skip,
+      take: pageSize,
+    });
+    const totalContacts = await prisma.contact.count();
+
+    res.status(200).json({
+      contacts,
+      pagination: {
+        totalContacts,
+        page,
+        pageSize,
+        totalPages: Math.ceil(totalContacts / pageSize),
+      },
+    });
   } catch (e) {
     console.log(e);
     res.status(400).json({

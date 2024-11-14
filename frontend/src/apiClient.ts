@@ -16,14 +16,8 @@ export const createContact = async (data: ContactType) => {
   return response.json();
 };
 
-export const updateContact = async ({
-  data,
-  id,
-}: {
-  data: ContactType;
-  id: string;
-}) => {
-  const response = await fetch(`${BACKEND_URL}/contacts/${id}`, {
+export const updateContact = async (data: ContactType) => {
+  const response = await fetch(`${BACKEND_URL}/contacts/${data.id}`, {
     method: "PUT",
     body: JSON.stringify(data),
     headers: {
@@ -46,9 +40,12 @@ export const deleteContact = async (id: string) => {
   return response.json();
 };
 
-export const getAllContacts = async () => {
-  const response = await fetch(`${BACKEND_URL}/contacts`, {
+export const getAllContacts = async (page: number) => {
+  const response = await fetch(`${BACKEND_URL}/contacts?page=${page}`, {
     method: "GET",
+    headers: {
+      "Content-type": "application/json",
+    },
   });
   if (!response.ok) {
     throw new Error("Something went wrong please try again");

@@ -1,12 +1,11 @@
 import { Dialog, DialogTitle } from "@mui/material";
 import { useForm } from "react-hook-form";
-import * as apiClient from "../apiClient";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 type Props = {
   open: boolean;
   onClose: () => void;
   contact?: ContactType | null;
-  id?: string | null;
+  onSave: (data: ContactType) => void;
 };
 
 export type ContactType = {
@@ -16,54 +15,37 @@ export type ContactType = {
   phoneNumber: string;
   company: string;
   jobTitle: string;
+  id: string;
 };
 
-const CreateContactDialog = ({ onClose, open, contact, id }: Props) => {
-  const queryClient = useQueryClient();
+const CreateContactDialog = ({ onClose, open, contact, onSave }: Props) => {
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<ContactType>({
-    defaultValues: contact
-      ? {
-          email: contact.email,
-          lastName: contact.lastName,
-          firstName: contact.firstName,
-          company: contact.company,
-          jobTitle: contact.jobTitle,
-          phoneNumber: contact.phoneNumber,
-        }
-      : {},
-  });
-  const { mutate: createContact } = useMutation({
-    mutationFn: apiClient.createContact,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["GetAllContacts"] });
-    },
-    onError: () => {},
-  });
-  const { mutate: updateContact } = useMutation({
-    mutationFn: apiClient.updateContact,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["GetAllContacts"] });
-    },
-    onError: () => {},
-  });
+    reset,
+  } = useForm<ContactType>();
+  useEffect(() => {
+    reset({
+      firstName: contact?.firstName || "",
+      lastName: contact?.lastName || "",
+      email: contact?.email || "",
+      company: contact?.company || "",
+      jobTitle: contact?.jobTitle || "",
+      phoneNumber: contact?.phoneNumber || "",
+      id: contact?.id || "",
+    });
+  }, [contact, onSave]);
+
   const onSubmit = (data: ContactType) => {
-    if (id && contact) {
-      updateContact({ data, id });
-    } else {
-      createContact(data);
-    }
-    onClose();
+    onSave(data);
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>
         <div className="font-bold text-blue-500">
-          {id ? "Update Contact" : "Create Contact"}
+          {contact ? "Update Contact" : "Create Contact"}
         </div>
         <div className="p-2 min-w-[400px] flex justify-center items-center flex-col">
           <form onSubmit={handleSubmit(onSubmit)} className="w-full">
@@ -109,10 +91,6 @@ const CreateContactDialog = ({ onClose, open, contact, id }: Props) => {
                   type="email"
                   {...register("email", {
                     required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                      message: "Invalid email address",
-                    },
                   })}
                 />
               </label>
@@ -181,7 +159,7 @@ const CreateContactDialog = ({ onClose, open, contact, id }: Props) => {
               type="submit"
               className="bg-blue-500 text-white py-2 px-4 rounded-xl mt-4"
             >
-              {id ? "Update" : "Create"}
+              {contact ? "Update" : "Create"}
             </button>
           </form>
         </div>

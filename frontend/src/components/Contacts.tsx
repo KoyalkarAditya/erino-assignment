@@ -32,9 +32,14 @@ const Contacts = ({ contacts }: Props) => {
   const [selectedContact, setSelectedContact] = useState<ContactType | null>(
     null
   );
-
   const { mutate, isPending } = useMutation({
     mutationFn: apiClient.deleteContact,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["GetAllContacts"] });
+    },
+  });
+  const { mutate: updateContact } = useMutation({
+    mutationFn: apiClient.updateContact,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["GetAllContacts"] });
     },
@@ -45,6 +50,11 @@ const Contacts = ({ contacts }: Props) => {
   const handleUpdate = (contact: ContactType) => {
     setSelectedContact(contact);
     setIsOpen(true);
+  };
+  const handleUpdateContact = (contact: ContactType) => {
+    updateContact(contact);
+    setIsOpen(false);
+    setSelectedContact(null);
   };
   return (
     <>
@@ -101,7 +111,7 @@ const Contacts = ({ contacts }: Props) => {
         </Table>
       </TableContainer>
       <CreateContactDialog
-        id={selectedContact?.id || null}
+        onSave={handleUpdateContact}
         contact={selectedContact}
         onClose={() => {
           setIsOpen(false);

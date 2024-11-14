@@ -1,19 +1,37 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import "./App.css";
 import * as apiClient from "./apiClient";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Contacts from "./components/Contacts";
 import { useState } from "react";
-import CreateContactDialog from "./components/CreateContactDialog";
+import CreateContactDialog, {
+  ContactType,
+} from "./components/CreateContactDialog";
 
 function App() {
+  const queryClient = useQueryClient();
+
+  const [page, setPage] = useState(1);
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["GetAllContacts"],
-    queryFn: apiClient.getAllContacts,
+    queryKey: ["GetAllContacts", page],
+    queryFn: () => apiClient.getAllContacts(page),
     retry: false,
   });
   const [isOpen, setIsOpen] = useState(false);
+  const { mutate: createContact } = useMutation({
+    mutationFn: apiClient.createContact,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["GetAllContacts"] });
+    },
+    onError: () => {},
+  });
+
+  const handleCreateContact = (contact: ContactType) => {
+    createContact(contact);
+    setIsOpen(false);
+  };
+
   if (isLoading) {
     return (
       <Stack spacing={2}>
@@ -38,8 +56,27 @@ function App() {
           Add Contact
         </button>
       </div>
-      <Contacts contacts={data} />
-      <CreateContactDialog open={isOpen} onClose={() => setIsOpen(false)} />
+      <Contacts contacts={data.contacts} />
+      <div className="fixed bottom-10 right-5">
+        <div className="flex gap-2">
+          {Array.from({ length: data.pagination.totalPages }).map(
+            (__, index) => (
+              <div
+                key={index}
+                onClick={() => setPage(index + 1)}
+                className="px-4 py-2 cursor-pointer rounded-md bg-blue-400 text-white"
+              >
+                {index + 1}
+              </div>
+            )
+          )}
+        </div>
+      </div>
+      <CreateContactDialog
+        onSave={handleCreateContact}
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
     </div>
   );
 }
