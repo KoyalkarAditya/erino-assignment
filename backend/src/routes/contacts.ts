@@ -1,36 +1,14 @@
 import express, { Request, Response } from "express";
-import prisma from "../db";
+import prisma from "../db/db";
 
 const router = express.Router();
 
 router.get("/", async (req: Request, res: Response) => {
   try {
-    let filterQuery: Record<string, Record<string, string>> = {};
-    const { firstName, lastName, email, phoneNumber } = req.query;
-    if (firstName) {
-      filterQuery.firstName = {
-        contains: String(firstName),
-        mode: "insensitive",
-      };
-    }
-    if (lastName) {
-      filterQuery.lastName = {
-        contains: String(lastName),
-        mode: "insensitive",
-      };
-    }
-    if (email) {
-      filterQuery.email = { contains: String(email), mode: "insensitive" };
-    }
-    if (phoneNumber) {
-      filterQuery.phoneNumber = {
-        contains: String(phoneNumber),
-        mode: "insensitive",
-      };
-    }
-    const contacts = await prisma.contact.findMany({
-      where: filterQuery,
-    });
+    // let filterQuery: Record<string, Record<string, string>> = {};
+    // const { firstName, lastName, email, phoneNumber } = req.query;
+
+    const contacts = await prisma.contact.findMany();
     res.status(200).json(contacts);
   } catch (e) {
     console.log(e);
@@ -50,7 +28,7 @@ router.post("/", async (req: Request, res: Response) => {
         firstName,
         lastName,
         email,
-        phoneNumber,
+        phoneNumber: phoneNumber,
         company,
         jobTitle,
       },

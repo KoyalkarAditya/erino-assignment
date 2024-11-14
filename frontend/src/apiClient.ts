@@ -1,23 +1,14 @@
+import { ContactType } from "./components/CreateContactDialog";
+
 const BACKEND_URL = "http://localhost:3000";
 
-export const createContact = async (
-  firstName: string,
-  lastName: string,
-  email: string,
-  phoneNumber: number,
-  company: string,
-  jobTitle: string
-) => {
+export const createContact = async (data: ContactType) => {
   const response = await fetch(`${BACKEND_URL}/contacts`, {
     method: "POST",
-    body: JSON.stringify({
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      company,
-      jobTitle,
-    }),
+    body: JSON.stringify(data),
+    headers: {
+      "Content-type": "application/json",
+    },
   });
   if (!response.ok) {
     throw new Error("Something went wrong please try again");
@@ -25,24 +16,19 @@ export const createContact = async (
   return response.json();
 };
 
-export const updateContact = async (
-  firstName: string,
-  lastName: string,
-  email: string,
-  phoneNumber: number,
-  company: string,
-  jobTitle: string
-) => {
-  const response = await fetch(`${BACKEND_URL}/contacts`, {
+export const updateContact = async ({
+  data,
+  id,
+}: {
+  data: ContactType;
+  id: string;
+}) => {
+  const response = await fetch(`${BACKEND_URL}/contacts/${id}`, {
     method: "PUT",
-    body: JSON.stringify({
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      company,
-      jobTitle,
-    }),
+    body: JSON.stringify(data),
+    headers: {
+      "Content-type": "application/json",
+    },
   });
   if (!response.ok) {
     throw new Error("Something went wrong please try again");
@@ -52,7 +38,17 @@ export const updateContact = async (
 
 export const deleteContact = async (id: string) => {
   const response = await fetch(`${BACKEND_URL}/contacts/${id}`, {
-    method: "PUT",
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error("Something went wrong please try again");
+  }
+  return response.json();
+};
+
+export const getAllContacts = async () => {
+  const response = await fetch(`${BACKEND_URL}/contacts`, {
+    method: "GET",
   });
   if (!response.ok) {
     throw new Error("Something went wrong please try again");
