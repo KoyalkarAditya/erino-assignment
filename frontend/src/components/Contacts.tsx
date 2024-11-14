@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as apiClient from "../apiClient";
 import CreateContactDialog from "./CreateContactDialog";
 import { useState } from "react";
+import { useAppContext } from "../contexts/AppContext";
 
 type Props = {
   contacts: ContactType[];
@@ -32,16 +33,37 @@ const Contacts = ({ contacts }: Props) => {
   const [selectedContact, setSelectedContact] = useState<ContactType | null>(
     null
   );
+  const { showToast } = useAppContext();
   const { mutate, isPending } = useMutation({
     mutationFn: apiClient.deleteContact,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["GetAllContacts"] });
+      showToast({
+        type: "SUCCESS",
+        message: "Contact deleted successfully!!",
+      });
+    },
+    onError: () => {
+      showToast({
+        type: "ERROR",
+        message: "Something went wrong please try again",
+      });
     },
   });
   const { mutate: updateContact } = useMutation({
     mutationFn: apiClient.updateContact,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["GetAllContacts"] });
+      showToast({
+        type: "SUCCESS",
+        message: "Contact updated successfully!!",
+      });
+    },
+    onError: () => {
+      showToast({
+        type: "ERROR",
+        message: "Something went wrong please try again",
+      });
     },
   });
   const handleDelete = (id: string) => {

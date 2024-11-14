@@ -8,6 +8,7 @@ import { useState } from "react";
 import CreateContactDialog, {
   ContactType,
 } from "./components/CreateContactDialog";
+import { useAppContext } from "./contexts/AppContext";
 
 function App() {
   const queryClient = useQueryClient();
@@ -18,13 +19,23 @@ function App() {
     queryFn: () => apiClient.getAllContacts(page),
     retry: false,
   });
+  const { showToast } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const { mutate: createContact } = useMutation({
     mutationFn: apiClient.createContact,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["GetAllContacts"] });
+      showToast({
+        type: "SUCCESS",
+        message: "Contact created successfully!!",
+      });
     },
-    onError: () => {},
+    onError: () => {
+      showToast({
+        type: "ERROR",
+        message: "Something went wrong please try again",
+      });
+    },
   });
 
   const handleCreateContact = (contact: ContactType) => {
