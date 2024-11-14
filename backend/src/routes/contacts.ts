@@ -5,9 +5,6 @@ const router = express.Router();
 
 router.get("/", async (req: Request, res: Response) => {
   try {
-    // let filterQuery: Record<string, Record<string, string>> = {};
-    // const { firstName, lastName, email, phoneNumber } = req.query;
-
     const contacts = await prisma.contact.findMany();
     res.status(200).json(contacts);
   } catch (e) {
